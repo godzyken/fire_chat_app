@@ -1,0 +1,13 @@
+{
+  "message": {
+    "authorId": "authorId",
+    "id": "id",
+    "fileName": "fileName",
+    "previewData": "previewData",
+    "status": "status",
+    "text": "text",
+    "timestamp": "timestamp",
+    "type": "type",
+    "uri": "uri"
+  }
+}
