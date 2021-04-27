@@ -12,6 +12,8 @@ class SignUpController extends GetxController {
   FocusNode? focusNode;
   String? lastName;
   bool registering = false;
+  TextEditingController? firstnameController;
+  TextEditingController? lastnameController;
   TextEditingController? passwordController;
   TextEditingController? usernameController;
 
@@ -25,11 +27,12 @@ class SignUpController extends GetxController {
     firstName = faker.person.firstName();
     lastName = faker.person.lastName();
     email =
-    '${firstName!.toLowerCase()}.${lastName!.toLowerCase()}@${faker.internet.domainName()}';
+        '${firstName!.toLowerCase()}.${lastName!.toLowerCase()}@${faker.internet.domainName()}';
     focusNode = FocusNode();
     passwordController = TextEditingController(text: 'Qwased1-');
     usernameController = TextEditingController(text: email);
-
+    firstnameController = TextEditingController(text: firstName);
+    lastnameController = TextEditingController(text: lastName);
   }
 
   @override
@@ -52,6 +55,8 @@ class SignUpController extends GetxController {
         email: usernameController!.text,
         password: passwordController!.text,
       );
+
+
       await FirebaseChatCore.instance.createUserInFirestore(
         types.User(
           avatarUrl: 'https://i.pravatar.cc/300?u=$email',
@@ -60,24 +65,67 @@ class SignUpController extends GetxController {
           lastName: lastName,
         ),
       );
-      Get.to(context);
-
-    } catch (e) {
+      Get.offAllNamed('/home');
+    } on FirebaseAuthException catch (e) {
       registering = false;
 
-      await showDialog(context: context,
-        builder: (context) =>
-            AlertDialog(
-              actions: [
-                TextButton(onPressed: () => Get.back(),
-                  child: const Text('OK'),
-                ),
-              ],
-              content: Text(e.toString()),
-              title: const Text('Error'),
-            ),
-      );
+      if (e.code == 'account-exists-with-different-credential') {
+        String email = e.email!;
+        AuthCredential pendingCredential = e.credential!;
+
+        List<String>? userSignInMethods =
+            await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+
+        if (userSignInMethods.first == 'password') {
+          String password = '...';
+
+          UserCredential userCredential = await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: email, password: password);
+
+          await userCredential.user!.linkWithCredential(pendingCredential);
+
+          return Get.toNamed('/home');
+        }
+
+        if (userSignInMethods.first == 'facebook.com') {
+          String accessToken = '...';
+          FacebookAuthCredential? facebookAuthCredential =
+              FacebookAuthProvider.credential(accessToken) as FacebookAuthCredential?;
+
+          UserCredential userCredential = await FirebaseAuth.instance
+              .signInWithCredential(facebookAuthCredential!);
+
+          await userCredential.user!.linkWithCredential(pendingCredential);
+
+          return Get.toNamed('/home');
+        }
+
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text('OK'),
+              ),
+            ],
+            content: Text(e.toString()),
+            title: const Text('Error'),
+          ),
+        );
+      }
     }
   }
+
+  getProfileImage() {
+    if (FirebaseAuth.instance.currentUser!.photoURL != null){
+      return Image.network(FirebaseAuth.instance.currentUser!.photoURL!, height: 100, width: 100,);
+    } else {
+      return Icon(Icons.account_circle, size: 100);
+    }
+  }
+
+  getAvatar() {}
+
 
 }

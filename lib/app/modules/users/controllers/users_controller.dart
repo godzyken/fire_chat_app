@@ -1,3 +1,5 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:get/get.dart';
@@ -7,7 +9,11 @@ import 'package:get/route_manager.dart';
 
 class UsersController extends GetxController {
   //TODO: Implement UsersController
-  final users = FirebaseChatCore.instance.users();
+  // late final String? documentId;
+  // final users = FirebaseChatCore.instance.users();
+
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+
 
   @override
   void onInit() {
@@ -25,9 +31,9 @@ class UsersController extends GetxController {
   handlePressed(types.User otherUser, BuildContext context) async {
     final room = await FirebaseChatCore.instance.createRoom(otherUser);
 
-    Get.to(context);
-    Get.toNamed('/chat', arguments: room.id);
+    Get.toNamed('/chat', arguments: [room.id, room.type, room.users], preventDuplicates: true, parameters: users.parameters.entries.first.value);
   }
+
 
 
 }

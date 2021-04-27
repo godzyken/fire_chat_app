@@ -1,3 +1,4 @@
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -18,6 +19,23 @@ class SignInView extends GetView<SignInController> {
             padding: const EdgeInsets.only(top: 80, left: 24, right: 24),
             child: Column(
               children: [
+                Container(
+                  child: CircularProfileAvatar(
+                    '',
+                    imageBuilder: (context, imageProvider) => controller.getProfileImage(),
+                    child: Icon(
+                      Icons.person,
+                      size: 140,
+                    ),
+                    cacheImage: true,
+                    onTap: () => controller.getAvatar(),
+                    animateFromOldImageOnUrlChange: true,
+                    borderColor: Colors.purpleAccent,
+                    borderWidth: 3,
+                    elevation: 5,
+                    radius: 75,
+                  ),
+                ),
                 TextField(
                   autocorrect: false,
                   autofillHints:
@@ -80,7 +98,7 @@ class SignInView extends GetView<SignInController> {
                   onPressed: controller.logginIn
                       ? null
                       : () => Get.toNamed('/sign-up'),
-                  child: const Text('Register'),
+                  child: const Text('No Have One ??'),
                 ),
               ],
             ),

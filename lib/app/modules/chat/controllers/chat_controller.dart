@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fire_chat_app/app/modules/room/controllers/room_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
@@ -17,16 +19,20 @@ import 'package:http/http.dart' as http;
 
 
 class ChatController extends GetxController {
+  static final ChatController to = Get.find();
   List<types.Message>? messages = [];
-  List<types.Room>? rooms = [];
+
   bool isAttachmentUploading = false;
 
   final user = const types.User(id: '06c33e8b-e835-4736-80f4-63f44b66666c');
+
+  final room = RoomController().room;
 
   @override
   void onInit() {
     super.onInit();
     _loadMessages();
+
   }
 
   @override
@@ -126,13 +132,29 @@ class ChatController extends GetxController {
     update();
   }
 
+
   onPreviewDataFetched(types.TextMessage message, types.PreviewData previewData) {
     final updatedMessage = message.copyWith(previewData);
-    FirebaseChatCore.instance.updateMessage(updatedMessage, rooms!.single.id);
+    FirebaseChatCore.instance.updateMessage(updatedMessage, room.id);
   }
 
-  onSendPressed(types.PartialText message) {
-    FirebaseChatCore.instance.sendMessage(message, rooms!.single.id);
+  onSendPressed(types.PartialText message, types.Room room) async {
+
+    FirebaseChatCore.instance.sendMessage(message, room.id);
+  }
+
+  streamMessageStatus(types.Room room, types.Message message) async {
+    try {
+
+      var collectionReference = await FirebaseFirestore.instance.collection(room.id).doc(
+          'rooms/${room.id}/').collection('messages/$message.id').snapshots();
+
+      return room.id != null ? null : collectionReference;
+
+    } on Exception catch (e, s) {
+      print(s);
+      return null;
+    }
   }
 
   openFile(types.FileMessage message) async {
@@ -183,7 +205,7 @@ class ChatController extends GetxController {
 
         FirebaseChatCore.instance.sendMessage(
           message,
-          rooms!.single.id,
+          'roomId',
         );
         setAttachmentUploading(false);
       } on FirebaseException catch (e) {
@@ -225,7 +247,7 @@ class ChatController extends GetxController {
 
         FirebaseChatCore.instance.sendMessage(
           message,
-          rooms!.single.id,
+          'roomId',
         );
         setAttachmentUploading(false);
       } on FirebaseException catch (e) {

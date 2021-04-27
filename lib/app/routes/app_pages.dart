@@ -1,9 +1,12 @@
+import 'package:fire_chat_app/app/routes/app_middlewares.dart';
 import 'package:get/get.dart';
 
 import 'package:fire_chat_app/app/modules/channel/bindings/channel_binding.dart';
 import 'package:fire_chat_app/app/modules/channel/views/channel_view.dart';
 import 'package:fire_chat_app/app/modules/chat/bindings/chat_binding.dart';
 import 'package:fire_chat_app/app/modules/chat/views/chat_view.dart';
+import 'package:fire_chat_app/app/modules/createachatroom/bindings/createachatroom_binding.dart';
+import 'package:fire_chat_app/app/modules/createachatroom/views/createachatroom_view.dart';
 import 'package:fire_chat_app/app/modules/games/bindings/games_binding.dart';
 import 'package:fire_chat_app/app/modules/games/views/games_view.dart';
 import 'package:fire_chat_app/app/modules/home/bindings/home_binding.dart';
@@ -28,10 +31,13 @@ class AppPages {
 
   static final routes = [
     GetPage(
-      name: _Paths.HOME,
-      page: () => HomeView(),
-      binding: HomeBinding(),
-    ),
+        name: _Paths.HOME,
+        page: () => HomeView(),
+        binding: HomeBinding(),
+        // middlewares: [
+        //   Middleware(),
+        // ],
+        maintainState: true),
     GetPage(
       name: _Paths.SIGN_IN,
       page: () => SignInView(),
@@ -45,12 +51,12 @@ class AppPages {
     GetPage(
       name: _Paths.GAMES,
       page: () => GamesView(),
-      binding: GamesBinding(),
+      bindings: [GamesBinding(), SignInBinding()],
     ),
     GetPage(
       name: _Paths.PROFILE,
       page: () => ProfileView(),
-      binding: ProfileBinding(),
+      bindings: [ProfileBinding(), SignInBinding()],
     ),
     GetPage(
       name: _Paths.SPLASH,
@@ -60,22 +66,27 @@ class AppPages {
     GetPage(
       name: _Paths.CHAT,
       page: () => ChatView(),
-      binding: ChatBinding(),
+      bindings: [ChatBinding(), SignInBinding()],
     ),
     GetPage(
       name: _Paths.CHANNEL,
       page: () => ChannelView(),
-      binding: ChannelBinding(),
+      bindings: [ChannelBinding(), SignInBinding()],
     ),
     GetPage(
       name: _Paths.ROOM,
       page: () => RoomView(),
-      binding: RoomBinding(),
+      bindings: [RoomBinding(), SignInBinding()],
     ),
     GetPage(
       name: _Paths.USERS,
       page: () => UsersView(),
-      binding: UsersBinding(),
+      bindings: [UsersBinding(), SignInBinding()],
+    ),
+    GetPage(
+      name: _Paths.CREATEACHATROOM,
+      page: () => CreateachatroomView(),
+      binding: CreateachatroomBinding(),
     ),
   ];
 }

@@ -4,11 +4,13 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
 
 import '../controllers/chat_controller.dart';
 
 class ChatView extends GetView<ChatController> {
-  get context => BuildContext;
+  String get roomId => Uuid.NAMESPACE_DNS;
+
 
   @override
   Widget build(BuildContext context) {
@@ -19,16 +21,21 @@ class ChatView extends GetView<ChatController> {
         ),
         body: StreamBuilder<List<types.Message>>(
             stream:
-                FirebaseChatCore.instance.messages(controller.rooms!.single.id),
+                FirebaseChatCore.instance.messages(roomId),
             initialData: const [],
             builder: (context, snapshot) {
               return Chat(
                 l10n: const ChatL10nEn(
+                  today: 'Today',
+                  yesterday: 'Yesterday',
+                  sendButtonAccessibilityLabel: 'Send',
                   inputPlaceholder: 'Here',
+                  fileButtonAccessibilityLabel: 'File',
+                  emptyChatPlaceholder: 'No messages here yet',
                 ),
                 isAttachmentUploading: controller.isAttachmentUploading,
                 onSendPressed: (c) => controller.onSendPressed,
-                messages: controller.messages!,
+                messages: controller.messages!.toList(),
                 onAttachmentPressed: _handleAtachmentPressed,
                 onFilePressed: (c) => controller.openFile,
                 onPreviewDataFetched: controller.onPreviewDataFetched,
@@ -39,8 +46,10 @@ class ChatView extends GetView<ChatController> {
   }
 
   void _handleAtachmentPressed() {
+    BuildContext? context;
+
     showModalBottomSheet<void>(
-        context: context,
+      context: context!,
         builder: (BuildContext context) {
           return SizedBox(
             height: 144,
