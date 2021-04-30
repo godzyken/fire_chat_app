@@ -9,7 +9,7 @@ class Middleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     final authService = AuthService();
-    return authService.authed.value ? null : RouteSettings(name: '/sign-in');
+    return authService.authed != null ? null : RouteSettings(name: '/sign-in');
   }
 
   @override
@@ -26,7 +26,7 @@ class Middleware extends GetMiddleware {
   @override
   List<Bindings>? onBindingsStart(List<Bindings>? bindings) {
     final authService = Get.find<SignInController>();
-    if (authService.logginIn) {
+    if (authService.logginIn == true) {
       bindings!.add(SignInBinding());
     }
     return bindings;

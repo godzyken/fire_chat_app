@@ -16,23 +16,30 @@ import 'package:open_file/open_file.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class ChatController extends GetxController {
-  static final ChatController to = Get.find();
   List<types.Message>? messages = [];
-
   bool isAttachmentUploading = false;
 
   final user = const types.User(id: '06c33e8b-e835-4736-80f4-63f44b66666c');
 
-  final room = RoomController().room;
+  String? get roomId => RoomController().room!.id;
+
+  static String? get id => null;
+
+  static String? get authorId => null;
+
+  static int? get timestamp => null;
+
+  static types.Status? get status => null;
+
+  static types.MessageType? get type => null;
 
   @override
   void onInit() {
     super.onInit();
     _loadMessages();
 
+    update();
   }
 
   @override
@@ -106,7 +113,7 @@ class ChatController extends GetxController {
   ) {
     final index = messages!.indexWhere((element) => element.id == message!.id);
     final currentMessage = messages![index] as types.TextMessage;
-    final updatedMessage = currentMessage.copyWith(previewData!);
+    final updatedMessage = currentMessage.copyWith(previewData: previewData);
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       messages![index] = updatedMessage;
@@ -132,25 +139,25 @@ class ChatController extends GetxController {
     update();
   }
 
-
-  onPreviewDataFetched(types.TextMessage message, types.PreviewData previewData) {
-    final updatedMessage = message.copyWith(previewData);
-    FirebaseChatCore.instance.updateMessage(updatedMessage, room.id);
+  onPreviewDataFetched(types.TextMessage message, types.PreviewData previewData) async {
+    final updatedMessage = message.copyWith(previewData: previewData);
+    FirebaseChatCore.instance.updateMessage(updatedMessage, roomId!);
+    isAttachmentUploading = true;
   }
 
   onSendPressed(types.PartialText message, types.Room room) async {
-
     FirebaseChatCore.instance.sendMessage(message, room.id);
   }
 
   streamMessageStatus(types.Room room, types.Message message) async {
     try {
-
-      var collectionReference = await FirebaseFirestore.instance.collection(room.id).doc(
-          'rooms/${room.id}/').collection('messages/$message.id').snapshots();
+      var collectionReference = FirebaseFirestore.instance
+          .collection(room.id)
+          .doc('rooms/${room.id}/')
+          .collection('messages/${message.id}')
+          .snapshots();
 
       return room.id != null ? null : collectionReference;
-
     } on Exception catch (e, s) {
       print(s);
       return null;
@@ -263,10 +270,8 @@ class ChatController extends GetxController {
     final String? path = await FilePicker.platform.getDirectoryPath();
     if (path == null) {
       throw MissingPluginException(
-        'Unable to get application documents directory'
-      );
+          'Unable to get application documents directory');
     }
     return Directory(path);
   }
-
 }

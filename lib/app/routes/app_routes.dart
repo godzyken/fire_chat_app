@@ -26,5 +26,5 @@ abstract class _Paths {
   static const CHANNEL = '/channel';
   static const ROOM = '/room';
   static const USERS = '/users';
-  static const CREATEACHATROOM = '/createachatroom';
+  static const CREATEACHATROOM = '/create-chatroom';
 }

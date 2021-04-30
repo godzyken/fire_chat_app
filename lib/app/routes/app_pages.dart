@@ -33,10 +33,10 @@ class AppPages {
     GetPage(
         name: _Paths.HOME,
         page: () => HomeView(),
-        binding: HomeBinding(),
-        // middlewares: [
-        //   Middleware(),
-        // ],
+        bindings: [HomeBinding(), SignInBinding()],
+        middlewares: [
+          Middleware(),
+        ],
         maintainState: true),
     GetPage(
       name: _Paths.SIGN_IN,

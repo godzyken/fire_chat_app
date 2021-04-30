@@ -3,7 +3,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:get/get.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-import 'package:sentry_flutter/sentry_flutter.dart';
 import '../controllers/room_controller.dart';
 
 class RoomView extends GetView<RoomController> {
@@ -14,12 +13,20 @@ class RoomView extends GetView<RoomController> {
     textAlign: TextAlign.center,
   );
 
+  get onPressed => controller.user == null ? null : () => Get.toNamed('/users');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Rooms'),
           centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: onPressed,
+              icon: const Icon(Icons.add),
+            ),
+          ],
           brightness: Brightness.dark,
         ),
         body: FirebaseChatCore.instance.firebaseUser == null
@@ -81,7 +88,7 @@ class RoomView extends GetView<RoomController> {
                         }),
               ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.toNamed('/createachatroom'),
+        onPressed: () => Get.toNamed('/create-chatroom'),
           label: label,
       ),
     );

@@ -1,6 +1,7 @@
 
 import 'package:fire_chat_app/app/modules/home/bindings/home_binding.dart';
 import 'package:fire_chat_app/app/modules/home/views/home_view.dart';
+import 'package:fire_chat_app/app/modules/signIn/bindings/sign_in_binding.dart';
 import 'package:fire_chat_app/app/themes/app_theme_data.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ Future<void> main() async {
                   initialRoute: AppPages.INITIAL,
                   locale: Get.locale,
                   getPages: AppPages.routes,
-                  initialBinding: HomeBinding(),
+                  initialBinding: SignInBinding(),
                   darkTheme: ThemeData.dark(),
                   themeMode: AppThemeData.INITIAL,
               )

@@ -24,12 +24,12 @@ class CreateachatroomController extends GetxController {
   @override
   void onClose() {}
 
-  createRoom(String? name) async {
+  createRoom(String? name, types.User otherUser, BuildContext context) async {
     isCreated = false;
     try {
-      var room = RoomController().room;
+      var room = RoomController().createRoom(otherUser, context);
       final roomCreate = types.Room(
-        id: room.id,
+        id: room!.id,
         name: name,
         users: room.users,
         type: room.type,

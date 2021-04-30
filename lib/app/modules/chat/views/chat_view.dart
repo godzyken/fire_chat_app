@@ -4,24 +4,24 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 
 import 'package:get/get.dart';
-import 'package:uuid/uuid.dart';
 
 import '../controllers/chat_controller.dart';
 
 class ChatView extends GetView<ChatController> {
-  String get roomId => Uuid.NAMESPACE_DNS;
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('ChatView'),
-          centerTitle: true,
-        ),
-        body: StreamBuilder<List<types.Message>>(
-            stream:
-                FirebaseChatCore.instance.messages(roomId),
+      key: key,
+      appBar: AppBar(
+        title: Text('Chat View'),
+        centerTitle: true,
+      ),
+      body: GetBuilder<ChatController>(
+        init: ChatController(),
+        initState: (state) => reactive,
+        builder: (controller) => StreamBuilder<List<types.Message>>(
+            stream: FirebaseChatCore.instance.messages(controller.roomId!),
             initialData: const [],
             builder: (context, snapshot) {
               return Chat(
@@ -42,14 +42,16 @@ class ChatView extends GetView<ChatController> {
                 user: controller.user,
                 theme: const DefaultChatTheme(inputBackgroundColor: Colors.red),
               );
-            }));
+            }),
+      ),
+    );
   }
 
   void _handleAtachmentPressed() {
     BuildContext? context;
 
     showModalBottomSheet<void>(
-      context: context!,
+        context: context!,
         builder: (BuildContext context) {
           return SizedBox(
             height: 144,
